@@ -22,8 +22,11 @@ import com.jzo2o.foundations.model.dto.request.ServeUpsertReqDTO;
 import com.jzo2o.foundations.model.dto.response.ServeResDTO;
 import com.jzo2o.foundations.service.IServeService;
 import com.jzo2o.mysql.utils.PageHelperUtils;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -47,6 +50,18 @@ public class ServeServiceImpl extends ServiceImpl<ServeMapper, Serve> implements
 
     @Resource
     private RegionMapper regionMapper;
+
+    /**
+     * 查询区域服务信息并进行缓存
+     *
+     * @param id 对应serve表的主键
+     * @return 区域服务信息
+     */
+    @Cacheable(value = RedisConstants.CacheName.SERVE, key = "#id",cacheManager = RedisConstants.CacheManager.ONE_DAY)
+    @Override
+    public Serve queryServeByIdCache(Long id) {
+        return getById(id);
+    }
 
     /**
      * 分页查询
@@ -117,6 +132,7 @@ public class ServeServiceImpl extends ServiceImpl<ServeMapper, Serve> implements
     }
 
     @Override
+    @CachePut(value = RedisConstants.CacheName.SERVE, key = "#id",cacheManager = RedisConstants.CacheManager.ONE_DAY)
     @Transactional
     public Serve onSale(Long id){
         Serve serve = baseMapper.selectById(id);
@@ -152,6 +168,7 @@ public class ServeServiceImpl extends ServiceImpl<ServeMapper, Serve> implements
     }
 
     @Override
+    @CacheEvict(value = RedisConstants.CacheName.SERVE, key = "#id")
     @Transactional
     public Serve offSale(Long id){
         Serve serve = baseMapper.selectById(id);
