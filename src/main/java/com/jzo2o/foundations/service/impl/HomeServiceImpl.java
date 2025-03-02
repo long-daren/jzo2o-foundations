@@ -1,0 +1,67 @@
+package com.jzo2o.foundations.service.impl;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+
+import javax.annotation.Resource;
+
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
+import org.springframework.stereotype.Service;
+
+import com.jzo2o.foundations.constants.RedisConstants;
+import com.jzo2o.foundations.enums.FoundationStatusEnum;
+import com.jzo2o.foundations.mapper.ServeMapper;
+import com.jzo2o.foundations.model.domain.Region;
+import com.jzo2o.foundations.model.dto.response.ServeCategoryResDTO;
+import com.jzo2o.foundations.model.dto.response.ServeSimpleResDTO;
+import com.jzo2o.foundations.service.HomeService;
+import com.jzo2o.foundations.service.IRegionService;
+
+import cn.hutool.core.util.ObjectUtil;
+import lombok.extern.slf4j.Slf4j;
+
+@Service
+@Slf4j
+public class HomeServiceImpl implements HomeService {
+
+
+    @Resource
+    private ServeMapper serveMapper;
+
+    @Resource
+    private IRegionService regionService;
+    /**
+     * 根据区域id获取服务图标信息
+     *
+     * @param regionId 区域id
+     * @return 服务图标列表
+     */
+
+    @Override
+    public List<ServeCategoryResDTO> queryServeIconCategoryByRegionIdCache(Long regionId) {
+        //1.校验当前城市是否为启用状态
+        Region region = regionService.getById(regionId);
+        if (ObjectUtil.isNull(region) || ObjectUtil.equal(FoundationStatusEnum.DISABLE.getStatus(), region.getActiveStatus())) {
+            return Collections.emptyList();
+        }
+        //2.根据城市编码查询所有的服务图标
+        List<ServeCategoryResDTO> list = serveMapper.findServeIconCategoryByRegionId(regionId);
+        if (ObjectUtil.isEmpty(list)) {
+            return Collections.emptyList();
+        }
+
+        //3.服务类型取前两个，每个类型下服务项取前4个
+        int endIndex = list.size() >= 2 ? 2 : list.size();
+        List<ServeCategoryResDTO> serveCategoryResDTOS = new ArrayList<>(list.subList(0, endIndex));
+        serveCategoryResDTOS.forEach(serveCategoryResDTO -> {
+            List<ServeSimpleResDTO> serveResDTOList = serveCategoryResDTO.getServeResDTOList();
+            int endIndex2 = serveResDTOList.size() >= 4 ? 4 : serveResDTOList.size();
+            List<ServeSimpleResDTO> serveSimpleResDTOS = new ArrayList<>(serveResDTOList.subList(0, endIndex2));
+            serveCategoryResDTO.setServeResDTOList(serveSimpleResDTOS);
+        });
+        return serveCategoryResDTOS;
+    }
+}
