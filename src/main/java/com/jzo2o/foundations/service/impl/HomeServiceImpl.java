@@ -39,7 +39,14 @@ public class HomeServiceImpl implements HomeService {
      * @param regionId 区域id
      * @return 服务图标列表
      */
-
+    @Caching(
+        cacheable = {
+            @Cacheable(value = RedisConstants.CacheName.SERVE_ICON,key = "#regionId",unless = "#result.size() != 0",
+                cacheManager = RedisConstants.CacheManager.THIRTY_MINUTES),
+            @Cacheable(value = RedisConstants.CacheName.SERVE_ICON,key = "#regionId",unless = "#result.size() == 0",
+                cacheManager = RedisConstants.CacheManager.FOREVER)
+        }
+    )
     @Override
     public List<ServeCategoryResDTO> queryServeIconCategoryByRegionIdCache(Long regionId) {
         //1.校验当前城市是否为启用状态
