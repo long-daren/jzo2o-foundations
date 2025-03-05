@@ -32,9 +32,18 @@ public class SpringCacheSyncHandler {
         redisTemplate.delete(key);
         List<RegionSimpleResDTO> regionSimpleResDTOS = regionService.queryActiveRegionListCache();
         regionSimpleResDTOS.forEach(regionSimpleResDTO -> {
+            //删除该区域下的首页服务列表
             String key1 = RedisConstants.CacheName.SERVE_ICON + "::" + regionSimpleResDTO.getId();
             redisTemplate.delete(key1);
             homeService.queryServeIconCategoryByRegionIdCache(regionSimpleResDTO.getId());
+            //删除该区域下的服务类型列表缓存
+            String key2 = RedisConstants.CacheName.SERVE_TYPE + "::" + regionSimpleResDTO.getId();
+            redisTemplate.delete(key2);
+            homeService.queryServeTypeByRegionIdCache(regionSimpleResDTO.getId());
+            //删除该区域下的热门服务列表缓存
+            String hot_serve_key = RedisConstants.CacheName.HOT_SERVE + "::" + regionSimpleResDTO.getId();
+            redisTemplate.delete(hot_serve_key);
+            homeService.queryHotServeListByRegionId(regionSimpleResDTO.getId());
         });
         log.info(">>>>>>>>更新已启用区域完成");
     }

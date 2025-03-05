@@ -45,6 +45,43 @@
             type.sort_num,
             item.sort_num
     </select>
+    <select id="queryHotServeListByRegionId"
+            resultType="com.jzo2o.foundations.model.dto.response.ServeAggregationSimpleResDTO"
+            parameterType="java.lang.Long">
+        SELECT
+            serve.city_code,
+            item.name serve_item_name,
+            item.id serve_item_id,
+            item.unit,
+            item.detail_img,
+            serve.price,
+            item.img serve_item_image,
+            serve.id id
+        FROM
+            serve
+                inner JOIN serve_item AS item ON item.id = serve.serve_item_id
+        WHERE
+            serve.region_id = #{regionId} AND serve.is_hot = 1 AND serve.sale_status = 2
+        ORDER BY
+            serve.update_time DESC
+    </select>
+    <select id="queryServeDetailById" resultType="com.jzo2o.foundations.model.dto.response.ServeAggregationSimpleResDTO"
+            parameterType="java.lang.Long">
+        SELECT
+            serve.city_code,
+            item.name serve_item_name,
+            item.id serve_item_id,
+            item.unit,
+            item.detail_img,
+            serve.price,
+            item.img serve_item_image,
+            serve.id id
+        FROM
+            serve
+                inner JOIN serve_item AS item ON item.id = serve.serve_item_id
+        WHERE
+            serve.id = #{id} AND serve.sale_status = 2
+    </select>
 
     <!--手动的映射-->
     <resultMap id="ServeCategoryMap" type="com.jzo2o.foundations.model.dto.response.ServeCategoryResDTO">

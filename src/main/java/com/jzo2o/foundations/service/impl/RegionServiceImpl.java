@@ -180,7 +180,10 @@ public class RegionServiceImpl extends ServiceImpl<RegionMapper, Region> impleme
      * @param id 区域id
      */
     @Override
-    @Caching(evict = {@CacheEvict(value = RedisConstants.CacheName.JZ_CACHE, key = "'ACTIVE_REGIONS'")})
+    @Caching(evict = {
+        @CacheEvict(value = RedisConstants.CacheName.JZ_CACHE, key = "'ACTIVE_REGIONS'"),
+        @CacheEvict(value = RedisConstants.CacheName.SERVE_TYPE, key = "#id")
+    })
     public void deactivate(Long id) {
         //区域信息
         Region region = baseMapper.selectById(id);

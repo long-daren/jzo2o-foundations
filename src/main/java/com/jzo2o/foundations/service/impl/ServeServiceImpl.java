@@ -104,6 +104,7 @@ public class ServeServiceImpl extends ServiceImpl<ServeMapper, Serve> implements
     }
 
     @Override
+    @CacheEvict(value = RedisConstants.CacheName.SERVE, key = "#id")
     @Transactional
     public Serve update(Long id, BigDecimal price) {
         //1.更新服务价格
@@ -132,7 +133,7 @@ public class ServeServiceImpl extends ServiceImpl<ServeMapper, Serve> implements
     }
 
     @Override
-    @CachePut(value = RedisConstants.CacheName.SERVE, key = "#id",cacheManager = RedisConstants.CacheManager.ONE_DAY)
+    @CachePut(value = RedisConstants.CacheName.SERVE, key = "#id",unless = "#result.saleStatus != 2",cacheManager = RedisConstants.CacheManager.ONE_DAY)
     @Transactional
     public Serve onSale(Long id){
         Serve serve = baseMapper.selectById(id);
