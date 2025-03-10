@@ -65,22 +65,23 @@
         ORDER BY
             serve.update_time DESC
     </select>
-    <select id="queryServeDetailById" resultType="com.jzo2o.foundations.model.dto.response.ServeAggregationSimpleResDTO"
-            parameterType="java.lang.Long">
+    <select id="queryServeDetailById"
+            resultType="com.jzo2o.foundations.model.dto.response.ServeAggregationSimpleResDTO">
         SELECT
             serve.city_code,
-            item.name serve_item_name,
+            item.NAME serve_item_name,
             item.id serve_item_id,
             item.unit,
             item.detail_img,
             serve.price,
-            item.img serve_item_image,
+            item.img serve_item_img,
             serve.id id
         FROM
             serve
-                inner JOIN serve_item AS item ON item.id = serve.serve_item_id
+                INNER JOIN serve_item AS item ON item.id = serve.serve_item_id
         WHERE
-            serve.id = #{id} AND serve.sale_status = 2
+            serve.id = #{id}
+          AND serve.sale_status = 2
     </select>
 
     <!--手动的映射-->

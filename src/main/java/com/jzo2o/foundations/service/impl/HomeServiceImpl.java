@@ -152,6 +152,7 @@ public class HomeServiceImpl implements HomeService {
     )
     @Override
     public List<ServeAggregationSimpleResDTO> queryServeDetail(Long id) {
-        return serveMapper.queryServeDetailById(id);
+        List<ServeAggregationSimpleResDTO> serveAggregationSimpleResDTOS = serveMapper.queryServeDetailById(id);
+        return serveAggregationSimpleResDTOS;
     }
 }
