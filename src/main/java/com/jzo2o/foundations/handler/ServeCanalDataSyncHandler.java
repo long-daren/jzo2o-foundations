@@ -6,6 +6,7 @@ import com.jzo2o.foundations.constants.IndexConstants;
 import com.jzo2o.foundations.model.domain.ServeSync;
 import org.springframework.amqp.core.ExchangeTypes;
 import org.springframework.amqp.core.Message;
+import org.springframework.amqp.rabbit.annotation.Argument;
 import org.springframework.amqp.rabbit.annotation.Exchange;
 import org.springframework.amqp.rabbit.annotation.Queue;
 import org.springframework.amqp.rabbit.annotation.QueueBinding;
@@ -25,10 +26,10 @@ public class ServeCanalDataSyncHandler extends AbstractCanalRabbitMqMsgListener<
     private ElasticSearchTemplate elasticSearchTemplate;
 
     @RabbitListener(bindings = @QueueBinding(
-            value = @Queue(name = "canal-mq-jzo2o-foundations"),
-            exchange = @Exchange(name = "exchange.canal-jzo2o", type = ExchangeTypes.TOPIC),
-            key = "canal-mq-jzo2o-foundations"),
-            concurrency = "1"
+        value = @Queue(name = "canal-mq-jzo2o-foundations",arguments={@Argument(name="x-single-active-consumer", value = "true", type = "java.lang.Boolean") }),
+        exchange = @Exchange(name="exchange.canal-jzo2o",type = ExchangeTypes.TOPIC),
+        key="canal-mq-jzo2o-foundations"),
+        concurrency="1"
     )
     public void onMessage(Message message) throws Exception {
         parseMsg(message);
